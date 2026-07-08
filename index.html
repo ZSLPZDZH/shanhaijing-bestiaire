@@ -1,0 +1,897 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>山海经异兽图鉴 - 上古神兽全收录</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700;900&family=Ma+Shan+Zheng&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #8B4513;
+            --primary-dark: #5D2F0D;
+            --accent: #C41E3A;
+            --accent-light: #E85D75;
+            --gold: #D4A017;
+            --gold-light: #F0D878;
+            --bg-dark: #1A0F0A;
+            --bg-medium: #2A1810;
+            --bg-light: #3D2418;
+            --text-primary: #F5E6D3;
+            --text-secondary: #C9B896;
+            --text-muted: #8B7355;
+            --border: #5D3A1A;
+            --shadow: rgba(0,0,0,0.5);
+            --card-bg: rgba(45, 28, 18, 0.9);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Noto Serif SC', serif;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* 背景纹理 */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(ellipse at 20% 80%, rgba(139, 69, 19, 0.15) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 20%, rgba(196, 30, 58, 0.1) 0%, transparent 50%),
+                url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23D4A017' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* 英雄区域 */
+        .hero {
+            position: relative;
+            min-height: 60vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 4rem 2rem;
+            overflow: hidden;
+            border-bottom: 2px solid var(--gold);
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(ellipse at center, rgba(139, 69, 19, 0.3) 0%, transparent 70%),
+                linear-gradient(180deg, rgba(26, 15, 10, 0.8) 0%, rgba(26, 15, 10, 0.95) 100%);
+            z-index: 0;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+            max-width: 900px;
+        }
+
+        .hero-badge {
+            display: inline-block;
+            padding: 0.4rem 1.2rem;
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            font-size: 0.85rem;
+            letter-spacing: 0.3em;
+            margin-bottom: 1.5rem;
+            border-radius: 2px;
+        }
+
+        .hero h1 {
+            font-family: 'Ma Shan Zheng', cursive;
+            font-size: clamp(3rem, 8vw, 6rem);
+            font-weight: 400;
+            color: var(--gold-light);
+            text-shadow: 
+                0 0 20px rgba(212, 160, 23, 0.3),
+                0 4px 8px rgba(0,0,0,0.5);
+            margin-bottom: 1rem;
+            letter-spacing: 0.1em;
+        }
+
+        .hero-subtitle {
+            font-size: clamp(1rem, 2.5vw, 1.4rem);
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+            font-weight: 400;
+            letter-spacing: 0.15em;
+        }
+
+        .hero-desc {
+            font-size: 1rem;
+            color: var(--text-muted);
+            line-height: 1.8;
+            max-width: 600px;
+            margin: 0 auto 2rem;
+        }
+
+        .hero-stats {
+            display: flex;
+            justify-content: center;
+            gap: 3rem;
+            flex-wrap: wrap;
+            margin-top: 2rem;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-family: 'Ma Shan Zheng', cursive;
+            font-size: 2.5rem;
+            color: var(--gold);
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            letter-spacing: 0.1em;
+        }
+
+        /* 装饰边框 */
+        .ornament {
+            width: 120px;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--gold), transparent);
+            margin: 1rem auto;
+        }
+
+        /* 主内容区域 */
+        .main-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 3rem 2rem;
+        }
+
+        /* 控制栏 */
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 2.5rem;
+            padding: 1.5rem;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+        }
+
+        .search-box {
+            position: relative;
+            flex: 1;
+            min-width: 250px;
+            max-width: 400px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 0.8rem 1rem 0.8rem 2.5rem;
+            background: var(--bg-medium);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--text-primary);
+            font-family: 'Noto Serif SC', serif;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: var(--gold);
+            box-shadow: 0 0 10px rgba(212, 160, 23, 0.2);
+        }
+
+        .search-box input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .search-box::before {
+            content: '🔍';
+            position: absolute;
+            left: 0.8rem;
+            top: 50%;
+            transform: translateY(-50%);
+            opacity: 0.5;
+        }
+
+        .filter-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .filter-btn {
+            padding: 0.6rem 1.2rem;
+            background: var(--bg-medium);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--text-secondary);
+            font-family: 'Noto Serif SC', serif;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            letter-spacing: 0.05em;
+        }
+
+        .filter-btn:hover {
+            background: var(--bg-light);
+            border-color: var(--gold);
+            color: var(--gold);
+        }
+
+        .filter-btn.active {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border-color: var(--gold);
+            color: var(--gold-light);
+        }
+
+        /* 网格布局 */
+        .beasts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        /* 卡片 */
+        .beast-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+
+        .beast-card:hover {
+            transform: translateY(-8px);
+            border-color: var(--gold);
+            box-shadow: 
+                0 20px 40px rgba(0,0,0,0.4),
+                0 0 20px rgba(212, 160, 23, 0.1);
+        }
+
+        .beast-card .card-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            background: linear-gradient(135deg, var(--bg-medium), var(--bg-light));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .beast-card .card-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .beast-card:hover .card-image img {
+            transform: scale(1.08);
+        }
+
+        .beast-card .no-image {
+            font-family: 'Ma Shan Zheng', cursive;
+            font-size: 3rem;
+            color: var(--gold);
+            opacity: 0.3;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .beast-card .no-image span {
+            font-size: 0.85rem;
+            font-family: 'Noto Serif SC', serif;
+            letter-spacing: 0.2em;
+        }
+
+        .card-body {
+            padding: 1.2rem;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 0.8rem;
+        }
+
+        .card-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--gold-light);
+            letter-spacing: 0.05em;
+        }
+
+        .card-pinyin {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            font-style: italic;
+            margin-top: 0.2rem;
+        }
+
+        .card-category {
+            display: inline-block;
+            padding: 0.2rem 0.6rem;
+            background: rgba(212, 160, 23, 0.15);
+            border: 1px solid rgba(212, 160, 23, 0.3);
+            border-radius: 4px;
+            font-size: 0.7rem;
+            color: var(--gold);
+            letter-spacing: 0.1em;
+            white-space: nowrap;
+        }
+
+        .card-location {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-bottom: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .card-original {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            padding: 0.8rem;
+            background: rgba(0,0,0,0.2);
+            border-radius: 6px;
+            border-left: 3px solid var(--gold);
+            margin-bottom: 0.8rem;
+            font-style: italic;
+        }
+
+        .card-keypoints {
+            font-size: 0.8rem;
+            color: var(--accent-light);
+            line-height: 1.5;
+        }
+
+        .card-keypoints::before {
+            content: '✦ ';
+            color: var(--gold);
+        }
+
+        /* 详情弹窗 */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(8px);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, var(--bg-medium), var(--bg-dark));
+            border: 2px solid var(--gold);
+            border-radius: 12px;
+            max-width: 700px;
+            width: 100%;
+            max-height: 85vh;
+            overflow-y: auto;
+            position: relative;
+            transform: translateY(30px) scale(0.95);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 
+                0 0 40px rgba(212, 160, 23, 0.15),
+                0 20px 60px rgba(0,0,0,0.5);
+        }
+
+        .modal-overlay.active .modal-content {
+            transform: translateY(0) scale(1);
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            width: 36px;
+            height: 36px;
+            background: rgba(0,0,0,0.5);
+            border: 1px solid var(--border);
+            border-radius: 50%;
+            color: var(--text-secondary);
+            font-size: 1.2rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            z-index: 10;
+        }
+
+        .modal-close:hover {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: white;
+        }
+
+        .modal-image {
+            width: 100%;
+            height: 300px;
+            object-fit: cover;
+            background: linear-gradient(135deg, var(--bg-medium), var(--bg-light));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .modal-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .modal-image .no-image-large {
+            font-family: 'Ma Shan Zheng', cursive;
+            font-size: 5rem;
+            color: var(--gold);
+            opacity: 0.2;
+        }
+
+        .modal-body {
+            padding: 2rem;
+        }
+
+        .modal-title-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 0.5rem;
+        }
+
+        .modal-title {
+            font-family: 'Ma Shan Zheng', cursive;
+            font-size: 2.5rem;
+            color: var(--gold-light);
+        }
+
+        .modal-pinyin {
+            font-size: 1rem;
+            color: var(--text-muted);
+            font-style: italic;
+            margin-bottom: 1rem;
+        }
+
+        .modal-meta {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .modal-meta-tag {
+            padding: 0.3rem 0.8rem;
+            background: rgba(212, 160, 23, 0.15);
+            border: 1px solid rgba(212, 160, 23, 0.3);
+            border-radius: 4px;
+            font-size: 0.8rem;
+            color: var(--gold);
+        }
+
+        .modal-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-section-title {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--gold);
+            margin-bottom: 0.6rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .modal-section-title::before {
+            content: '';
+            width: 4px;
+            height: 1.2rem;
+            background: var(--gold);
+            border-radius: 2px;
+        }
+
+        .modal-original {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            line-height: 1.8;
+            padding: 1rem;
+            background: rgba(0,0,0,0.3);
+            border-radius: 8px;
+            border-left: 4px solid var(--gold);
+            font-style: italic;
+        }
+
+        .modal-keypoints {
+            font-size: 0.9rem;
+            color: var(--accent-light);
+            line-height: 1.7;
+            padding: 1rem;
+            background: rgba(196, 30, 58, 0.08);
+            border-radius: 8px;
+            border-left: 4px solid var(--accent);
+        }
+
+        .modal-explanation {
+            font-size: 0.9rem;
+            color: var(--text-primary);
+            line-height: 1.9;
+            text-align: justify;
+        }
+
+        /* 页脚 */
+        .footer {
+            text-align: center;
+            padding: 3rem 2rem;
+            border-top: 1px solid var(--border);
+            margin-top: 3rem;
+        }
+
+        .footer-text {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            line-height: 1.8;
+        }
+
+        .footer-ornament {
+            width: 80px;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--gold), transparent);
+            margin: 1rem auto;
+        }
+
+        /* 滚动条 */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-dark);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--gold);
+        }
+
+        /* 响应式 */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .beasts-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .controls {
+                flex-direction: column;
+            }
+
+            .search-box {
+                max-width: 100%;
+            }
+
+            .modal-content {
+                margin: 1rem;
+                max-height: 90vh;
+            }
+
+            .modal-title {
+                font-size: 1.8rem;
+            }
+        }
+
+        /* 动画 */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .beast-card {
+            animation: fadeInUp 0.5s ease forwards;
+        }
+
+        /* 计数提示 */
+        .results-count {
+            text-align: center;
+            margin-bottom: 1.5rem;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .results-count span {
+            color: var(--gold);
+            font-weight: 700;
+        }
+    </style>
+</head>
+<body>
+    <!-- 英雄区域 -->
+    <header class="hero">
+        <div class="hero-content">
+            <div class="hero-badge">先秦古籍 · 上古神话</div>
+            <h1>山海经异兽图鉴</h1>
+            <div class="ornament"></div>
+            <p class="hero-subtitle">探秘上古神兽的奇幻世界</p>
+            <p class="hero-desc">
+                《山海经》成书于战国至汉初，是中国最古老的地理志怪典籍之一。<br>
+                全书十八篇，记载了五百余座山川、三百余条河流，以及一百余种奇珍异兽。<br>
+                这些神兽形态各异，或祥瑞、或凶煞，承载着华夏先民对自然万物的敬畏与想象。
+            </p>
+            <div class="hero-stats">
+                <div class="stat-item">
+                    <span class="stat-number" id="stat-total">109</span>
+                    <span class="stat-label">异兽收录</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">18</span>
+                    <span class="stat-label">经文篇章</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">2000+</span>
+                    <span class="stat-label">年历史传承</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- 主内容 -->
+    <main class="main-content">
+        <!-- 控制栏 -->
+        <div class="controls">
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="搜索神兽名称、描述...">
+            </div>
+            <div class="filter-buttons">
+                <button class="filter-btn active" data-filter="all">全部</button>
+                <button class="filter-btn" data-filter="南山经">南山经</button>
+                <button class="filter-btn" data-filter="西山经">西山经</button>
+                <button class="filter-btn" data-filter="北山经">北山经</button>
+                <button class="filter-btn" data-filter="东山经">东山经</button>
+                <button class="filter-btn" data-filter="中山经">中山经</button>
+                <button class="filter-btn" data-filter="海外经">海外经</button>
+                <button class="filter-btn" data-filter="海内经">海内经</button>
+                <button class="filter-btn" data-filter="大荒经">大荒经</button>
+            </div>
+        </div>
+
+        <div class="results-count" id="resultsCount">共收录 <span>109</span> 只神兽</div>
+
+        <!-- 神兽网格 -->
+        <div class="beasts-grid" id="beastsGrid"></div>
+    </main>
+
+    <!-- 详情弹窗 -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal-content">
+            <button class="modal-close" id="modalClose">✕</button>
+            <div class="modal-image" id="modalImage"></div>
+            <div class="modal-body">
+                <div class="modal-title-row">
+                    <div>
+                        <div class="modal-title" id="modalTitle"></div>
+                        <div class="modal-pinyin" id="modalPinyin"></div>
+                    </div>
+                </div>
+                <div class="modal-meta" id="modalMeta"></div>
+                <div class="modal-section">
+                    <div class="modal-section-title">原文描述</div>
+                    <div class="modal-original" id="modalOriginal"></div>
+                </div>
+                <div class="modal-section">
+                    <div class="modal-section-title">原文要点</div>
+                    <div class="modal-keypoints" id="modalKeypoints"></div>
+                </div>
+                <div class="modal-section">
+                    <div class="modal-section-title">通俗解释</div>
+                    <div class="modal-explanation" id="modalExplanation"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 页脚 -->
+    <footer class="footer">
+        <div class="footer-ornament"></div>
+        <p class="footer-text">
+            《山海经》异兽图鉴 · 基于《山海经》原文整理<br>
+            数据来源于《山海经》各篇经文及郭璞注、郝懿行笺疏等权威文献<br>
+            本图鉴仅供学术研究与文化传播参考
+        </p>
+    </footer>
+
+    <script>
+        // 神兽数据
+        let beastsData = [];
+        let currentFilter = 'all';
+        let searchTerm = '';
+
+        // 加载数据
+        async function loadData() {
+            try {
+                const response = await fetch('beasts_data.json');
+                beastsData = await response.json();
+                renderBeasts();
+            } catch (error) {
+                console.error('加载数据失败:', error);
+                document.getElementById('beastsGrid').innerHTML = '<div style="text-align:center;color:var(--text-muted);padding:3rem;">数据加载失败，请刷新页面重试</div>';
+            }
+        }
+
+        // 渲染神兽卡片
+        function renderBeasts() {
+            const grid = document.getElementById('beastsGrid');
+            const filtered = beastsData.filter(beast => {
+                const matchesFilter = currentFilter === 'all' || beast.category === currentFilter;
+                const matchesSearch = !searchTerm || 
+                    beast.name.includes(searchTerm) || 
+                    beast.pinyin.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                    beast.original.includes(searchTerm) ||
+                    beast.explanation.includes(searchTerm);
+                return matchesFilter && matchesSearch;
+            });
+
+            // 更新计数
+            document.getElementById('resultsCount').innerHTML = 
+                `共收录 <span>${filtered.length}</span> 只神兽`;
+
+            if (filtered.length === 0) {
+                grid.innerHTML = '<div style="text-align:center;color:var(--text-muted);padding:3rem;grid-column:1/-1;">未找到符合条件的神兽</div>';
+                return;
+            }
+
+            grid.innerHTML = filtered.map((beast, index) => `
+                <div class="beast-card" data-index="${beastsData.indexOf(beast)}" style="animation-delay: ${index * 0.03}s">
+                    <div class="card-image">
+                        ${beast.image ? 
+                            `<img src="${beast.image}" alt="${beast.name}" loading="lazy">` : 
+                            `<div class="no-image">
+                                ${beast.name.substring(0, 1)}
+                                <span>暂无图像</span>
+                            </div>`
+                        }
+                    </div>
+                    <div class="card-body">
+                        <div class="card-header">
+                            <div>
+                                <div class="card-title">${beast.name}</div>
+                                <div class="card-pinyin">${beast.pinyin}</div>
+                            </div>
+                            <span class="card-category">${beast.category}</span>
+                        </div>
+                        <div class="card-location">📍 ${beast.location}</div>
+                        <div class="card-original">${beast.original}</div>
+                        <div class="card-keypoints">${beast.key_points}</div>
+                    </div>
+                </div>
+            `).join('');
+
+            // 绑定点击事件
+            document.querySelectorAll('.beast-card').forEach(card => {
+                card.addEventListener('click', () => {
+                    const index = parseInt(card.dataset.index);
+                    openModal(beastsData[index]);
+                });
+            });
+        }
+
+        // 打开弹窗
+        function openModal(beast) {
+            document.getElementById('modalTitle').textContent = beast.name;
+            document.getElementById('modalPinyin').textContent = beast.pinyin;
+            document.getElementById('modalOriginal').textContent = beast.original;
+            document.getElementById('modalKeypoints').textContent = beast.key_points;
+            document.getElementById('modalExplanation').textContent = beast.explanation;
+            
+            document.getElementById('modalMeta').innerHTML = `
+                <span class="modal-meta-tag">${beast.category}</span>
+                <span class="modal-meta-tag">📍 ${beast.location}</span>
+            `;
+
+            const imageContainer = document.getElementById('modalImage');
+            if (beast.image) {
+                imageContainer.innerHTML = `<img src="${beast.image}" alt="${beast.name}">`;
+            } else {
+                imageContainer.innerHTML = `<div class="no-image-large">${beast.name.substring(0, 1)}</div>`;
+            }
+
+            document.getElementById('modalOverlay').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        // 关闭弹窗
+        function closeModal() {
+            document.getElementById('modalOverlay').classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        // 事件监听
+        document.getElementById('modalClose').addEventListener('click', closeModal);
+        document.getElementById('modalOverlay').addEventListener('click', (e) => {
+            if (e.target === e.currentTarget) closeModal();
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeModal();
+        });
+
+        // 筛选按钮
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentFilter = btn.dataset.filter;
+                renderBeasts();
+            });
+        });
+
+        // 搜索
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+            searchTerm = e.target.value.trim();
+            renderBeasts();
+        });
+
+        // 初始化
+        loadData();
+    </script>
+</body>
+</html>

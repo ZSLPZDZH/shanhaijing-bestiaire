@@ -1,0 +1,10 @@
+.DS_Store
+Thumbs.db
+*.log
+.vercel/
+.env
+.env.*
+!.env.example
+node_modules/
+dist/
+build/
