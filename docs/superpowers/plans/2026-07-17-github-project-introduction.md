@@ -1,6 +1,6 @@
 # GitHub Project Introduction Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
 
 **Goal:** 为《山海经异兽图鉴》补齐产品型 README、真实页面预览和 GitHub 仓库元数据，让普通文化爱好者能快速理解并体验项目。
 
@@ -24,7 +24,7 @@
 **Files:**
 - Create: `docs/assets/project-preview.webp`
 
-- [ ] **Step 1: Create the documented asset directory**
+- [x] **Step 1: Create the documented asset directory**
 
 Run from the repository root:
 
@@ -34,7 +34,7 @@ New-Item -ItemType Directory -Path 'docs\assets' -Force | Out-Null
 
 Expected: `docs/assets/` exists; `CLAUDE.md` already identifies it as documentation preview storage.
 
-- [ ] **Step 2: Capture the real production page with corrected visible scope**
+- [x] **Step 2: Capture the real production page with corrected visible scope**
 
 Start Chrome headless at `1440x1100` with remote debugging, open the production URL, then use CDP `Runtime.evaluate` before `Page.captureScreenshot`:
 
@@ -50,7 +50,7 @@ If hiding the counters leaves excessive space, the same temporary CDP session ma
 
 Expected: CDP confirms both selectors were hidden, then creates `docs/assets/project-preview-source.png` at `1440x1100` showing the title, filter controls, and first row of beast cards without the stale count text.
 
-- [ ] **Step 3: Convert and compress the screenshot**
+- [x] **Step 3: Convert and compress the screenshot**
 
 Run:
 
@@ -64,7 +64,7 @@ ffmpeg -y `
 
 Expected: exit code `0` and `docs/assets/project-preview.webp` exists.
 
-- [ ] **Step 4: Verify the final asset before removing the source**
+- [x] **Step 4: Verify the final asset before removing the source**
 
 Run:
 
@@ -87,7 +87,7 @@ $probe.streams[0]
 
 Expected: codec is `webp`, width is `1440`, height is `1100`, and the file is non-empty.
 
-- [ ] **Step 5: Remove only the verified intermediate PNG**
+- [x] **Step 5: Remove only the verified intermediate PNG**
 
 Run:
 
@@ -107,7 +107,7 @@ Expected: the PNG is removed and `project-preview.webp` remains.
 - Create: `README.md`
 - Use: `docs/assets/project-preview.webp`
 
-- [ ] **Step 1: Create the complete README**
+- [x] **Step 1: Create the complete README**
 
 Use `apply_patch` to create `README.md` with exactly this content:
 
@@ -184,7 +184,7 @@ python -m http.server 4173
 仓库当前未声明统一开源许可证。代码、整理文本和图片可能具有不同的权利边界；如需复制、改编或用于商业项目，请先确认对应内容的授权状态。
 ```
 
-- [ ] **Step 2: Verify README facts against the data**
+- [x] **Step 2: Verify README facts against the data**
 
 Run:
 
@@ -222,7 +222,7 @@ $categories
 
 Expected: unique name count is `89`, eight category names are printed, and no exception is raised.
 
-- [ ] **Step 3: Verify README links and local asset paths**
+- [x] **Step 3: Verify README links and local asset paths**
 
 Run:
 
@@ -250,7 +250,7 @@ if ($response.StatusCode -ne 200 -or $response.Content -notmatch '山海经异�
 
 Expected: no missing paths, HTTP status `200`, and the returned page contains `山海经异兽图鉴`.
 
-- [ ] **Step 4: Check Markdown and whitespace**
+- [x] **Step 4: Check Markdown and whitespace**
 
 Run:
 
@@ -263,7 +263,7 @@ Select-String -LiteralPath 'README.md' `
 
 Expected: `git diff --check` reports no errors and `Select-String` returns no matches.
 
-- [ ] **Step 5: Commit the README and preview atomically**
+- [x] **Step 5: Commit the README and preview atomically**
 
 Run:
 
@@ -282,7 +282,7 @@ Expected: one commit creates the README and its referenced preview asset.
 - Verify: `beasts_data.json`
 - Verify: `images/`
 
-- [ ] **Step 1: Verify every declared image exists**
+- [x] **Step 1: Verify every declared image exists**
 
 Run:
 
@@ -304,7 +304,7 @@ if ($missingImages.Count -gt 0) {
 
 Expected: all unique image paths are verified and no exception is raised.
 
-- [ ] **Step 2: Start a hidden local server and test site resources**
+- [x] **Step 2: Start a hidden local server and test site resources**
 
 Run:
 
@@ -474,7 +474,7 @@ Expected: the newly started process owns the listener on `127.0.0.1:4173`; the s
 - External: GitHub Homepage
 - External: GitHub Topics
 
-- [ ] **Step 1: Record the current metadata**
+- [x] **Step 1: Record the current metadata**
 
 Run:
 
@@ -485,7 +485,7 @@ gh repo view ZSLPZDZH/shanhaijing-bestiaire `
 
 Expected: the command returns the pre-change state for comparison.
 
-- [ ] **Step 2: Update About and Homepage**
+- [x] **Step 2: Update About and Homepage**
 
 Run:
 
@@ -499,7 +499,7 @@ gh api `
 
 Expected: the returned repository JSON contains the new `description` and `homepage`.
 
-- [ ] **Step 3: Replace Topics with the approved set**
+- [x] **Step 3: Replace Topics with the approved set**
 
 Run:
 
@@ -525,7 +525,7 @@ $topics | gh api `
 
 Expected: the response contains exactly the seven approved topics.
 
-- [ ] **Step 4: Re-read and assert the live metadata**
+- [x] **Step 4: Re-read and assert the live metadata**
 
 Run:
 
@@ -570,7 +570,7 @@ Expected: no exception is raised and the final metadata is printed.
 - Verify: `docs/assets/project-preview.webp`
 - Verify: Git history and working tree
 
-- [ ] **Step 1: Run repository integrity checks**
+- [x] **Step 1: Run repository integrity checks**
 
 Run:
 
@@ -582,7 +582,7 @@ git log -3 --oneline
 
 Expected: no whitespace errors, working tree is clean, and recent history contains the design, implementation plan, and README commits.
 
-- [ ] **Step 2: Confirm no dependency or license was added**
+- [x] **Step 2: Confirm no dependency or license was added**
 
 Run:
 
@@ -605,9 +605,9 @@ if ($unexpected) {
 
 Expected: the confirmation message is printed.
 
-- [ ] **Step 3: Preserve the no-push boundary**
+- [x] **Step 3: Preserve the no-push boundary during plan execution**
 
-Do not run `git push`, create a remote branch, or merge into `main`. Report the local branch name and commit IDs so the user can explicitly authorize publishing later.
+Do not run `git push`, create a remote branch, or merge into `main` while executing this plan. Report the local branch name and commit IDs so the user can explicitly authorize publishing as a separate step.
 
 ## Self-Review
 
@@ -616,3 +616,11 @@ Do not run `git push`, create a remote branch, or merge into `main`. Report the 
 - Placeholder scan: the plan contains no unresolved placeholders or deferred decisions.
 - Command consistency: all repository files use relative paths; external targets use the exact GitHub repository and verified Vercel URL.
 - Fact correction: all public-facing counts distinguish 109 data rows from 89 unique beast names; verification also checks 8 categories.
+
+## Outcome
+
+Completed on 2026-07-17 and published through [PR #1](https://github.com/ZSLPZDZH/shanhaijing-bestiaire/pull/1).
+
+- `README.md`, the production preview, GitHub About, Homepage, and Topics were updated.
+- Public-facing counts distinguish 109 data rows from 89 unique beast names across eight categories.
+- No dependency manifest, license, or site behavior change was added by this plan.
