@@ -4,7 +4,7 @@
 
 **Goal:** 为《山海经异兽图鉴》补齐产品型 README、真实页面预览和 GitHub 仓库元数据，让普通文化爱好者能快速理解并体验项目。
 
-**Architecture:** 保持现有纯静态站点不变，只新增仓库展示层。README 引用一张从生产站点截取的 WebP 预览图；GitHub About、Homepage 和 Topics 通过 GitHub CLI 更新并回读验证。
+**Architecture:** 保持现有纯静态站点不变，只新增仓库展示层。README 引用一张从生产站点截取的 WebP 预览图；截图会话通过浏览器 DOM 临时隐藏旧数量口径，不改生产文件；GitHub About、Homepage 和 Topics 通过 GitHub CLI 更新并回读验证。
 
 **Tech Stack:** Markdown, HTML/CSS/vanilla JavaScript, PowerShell, Chrome headless, FFmpeg, GitHub CLI, Vercel
 
@@ -34,21 +34,21 @@ New-Item -ItemType Directory -Path 'docs\assets' -Force | Out-Null
 
 Expected: `docs/assets/` exists; `CLAUDE.md` already identifies it as documentation preview storage.
 
-- [ ] **Step 2: Capture the real production page**
+- [ ] **Step 2: Capture the real production page with corrected visible scope**
 
-Run:
+Start Chrome headless at `1440x1100` with remote debugging, open the production URL, then use CDP `Runtime.evaluate` before `Page.captureScreenshot`:
 
-```powershell
-& 'C:\Program Files\Google\Chrome\Application\chrome.exe' `
-  --headless=new `
-  --disable-gpu `
-  --hide-scrollbars `
-  --window-size=1440,1100 `
-  --screenshot="$PWD\docs\assets\project-preview-source.png" `
-  'https://shanhaijing-alpha.vercel.app/'
+```javascript
+for (const selector of ['.hero-stats', '.results-count']) {
+  const element = document.querySelector(selector);
+  if (!element) throw new Error(`Missing screenshot selector: ${selector}`);
+  element.style.setProperty('display', 'none', 'important');
+}
 ```
 
-Expected: Chrome exits successfully and creates `docs/assets/project-preview-source.png` showing the title, filter controls, and first row of beast cards.
+If hiding the counters leaves excessive space, the same temporary CDP session may reduce `.hero`'s `min-height`. Do not edit `index.html` or any production file.
+
+Expected: CDP confirms both selectors were hidden, then creates `docs/assets/project-preview-source.png` at `1440x1100` showing the title, filter controls, and first row of beast cards without the stale count text.
 
 - [ ] **Step 3: Convert and compress the screenshot**
 
@@ -116,7 +116,7 @@ Use `apply_patch` to create `README.md` with exactly this content:
 
 # 山海经异兽图鉴
 
-可搜索、可分类浏览的《山海经》异兽数字图鉴，收录 109 种异兽及原文、释义与插图。
+可搜索、可分类浏览的《山海经》异兽数字图鉴，汇集 109 条图鉴记录，涵盖 89 个异兽名称及原文、释义与插图。
 
 [**在线体验 →**](https://shanhaijing-alpha.vercel.app/)
 
@@ -128,7 +128,7 @@ Use `apply_patch` to create `README.md` with exactly this content:
 
 这个项目把《山海经》中的异兽整理成可浏览的数字图鉴。它适合传统文化爱好者快速查找异兽、阅读原文，并通过通俗解释理解古籍中的形态、地点与传说。
 
-- **109 种异兽**：以卡片形式集中浏览名称、拼音、地点与核心特征。
+- **109 条图鉴记录**：涵盖 89 个异兽名称，以卡片形式集中浏览名称、拼音、地点与核心特征。
 - **八类经文筛选**：覆盖南山经、西山经、北山经、东山经、中山经、海外经、海内经与大荒经。
 - **全文搜索**：可按名称、拼音、原文和解释查找内容。
 - **详情阅读**：展开查看原文、原文要点、通俗解释与插图。
@@ -137,6 +137,8 @@ Use `apply_patch` to create `README.md` with exactly this content:
 ## 数据内容
 
 异兽数据集中保存在 [`beasts_data.json`](beasts_data.json)，每条记录包含：
+
+当前数据文件共有109条记录，对应89个异兽名称；部分名称存在重复条目。
 
 | 字段 | 内容 |
 | --- | --- |
@@ -189,24 +191,36 @@ Run:
 ```powershell
 $data = Get-Content -LiteralPath 'beasts_data.json' -Encoding utf8 -Raw | ConvertFrom-Json
 $categories = @($data.category | Sort-Object -Unique)
+$names = @($data.name | Sort-Object -Unique)
 $readme = Get-Content -LiteralPath 'README.md' -Encoding utf8 -Raw
 
 if ($data.Count -ne 109) {
-  throw "Expected 109 beasts, found $($data.Count)."
+  throw "Expected 109 data rows, found $($data.Count)."
+}
+
+if ($names.Count -ne 89) {
+  throw "Expected 89 unique beast names, found $($names.Count)."
 }
 
 if ($categories.Count -ne 8) {
   throw "Expected 8 categories, found $($categories.Count)."
 }
 
-if (-not $readme.Contains('109 种异兽') -or -not $readme.Contains('八类经文筛选')) {
+if (-not $readme.Contains('109 条图鉴记录') -or
+    -not $readme.Contains('89 个异兽名称') -or
+    -not $readme.Contains('八类经文筛选')) {
   throw 'README does not contain the verified collection counts.'
 }
 
+if ($readme -match '109\s+种异兽|109\s*只神兽') {
+  throw 'README still contains a misleading collection count.'
+}
+
+$names.Count
 $categories
 ```
 
-Expected: eight category names are printed and no exception is raised.
+Expected: unique name count is `89`, eight category names are printed, and no exception is raised.
 
 - [ ] **Step 3: Verify README links and local asset paths**
 
@@ -366,7 +380,7 @@ Run:
 gh api `
   --method PATCH `
   repos/ZSLPZDZH/shanhaijing-bestiaire `
-  -f 'description=可搜索、可分类浏览的《山海经》异兽数字图鉴，收录 109 种异兽及原文、释义与插图。' `
+  -f 'description=可搜索、可分类浏览的《山海经》异兽数字图鉴，汇集 109 条图鉴记录，涵盖 89 个异兽名称及原文、释义与插图。' `
   -f 'homepage=https://shanhaijing-alpha.vercel.app/'
 ```
 
@@ -406,7 +420,7 @@ Run:
 $repo = gh repo view ZSLPZDZH/shanhaijing-bestiaire `
   --json description,homepageUrl,repositoryTopics | ConvertFrom-Json
 
-$expectedDescription = '可搜索、可分类浏览的《山海经》异兽数字图鉴，收录 109 种异兽及原文、释义与插图。'
+$expectedDescription = '可搜索、可分类浏览的《山海经》异兽数字图鉴，汇集 109 条图鉴记录，涵盖 89 个异兽名称及原文、释义与插图。'
 $expectedHomepage = 'https://shanhaijing-alpha.vercel.app/'
 $expectedTopics = @(
   'bestiary',
@@ -488,3 +502,4 @@ Do not run `git push`, create a remote branch, or merge into `main`. Report the 
 - Scope: no site behavior, visual design, dependency, deployment, license, contribution workflow, or remote branch change is included.
 - Placeholder scan: the plan contains no unresolved placeholders or deferred decisions.
 - Command consistency: all repository files use relative paths; external targets use the exact GitHub repository and verified Vercel URL.
+- Fact correction: all public-facing counts distinguish 109 data rows from 89 unique beast names; verification also checks 8 categories.
