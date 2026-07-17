@@ -606,6 +606,56 @@
             background: var(--gold);
         }
 
+        /* 桌面端详情：优先完整展示竖版神兽插图 */
+        @media (min-width: 769px) {
+            .modal-content {
+                max-width: min(1120px, 100%);
+            }
+
+            .modal-image {
+                height: clamp(360px, 60vh, 720px);
+                overflow: hidden;
+            }
+
+            .modal-image img {
+                object-fit: contain;
+            }
+        }
+
+        @media (min-width: 769px) and (max-width: 979px) {
+            .modal-close {
+                position: sticky;
+                top: 1rem;
+                right: auto;
+                margin: 1rem 1rem -52px auto;
+            }
+        }
+
+        @media (min-width: 980px) {
+            .modal-content {
+                display: grid;
+                grid-template-columns: minmax(0, 1.05fr) minmax(420px, 0.95fr);
+                height: min(86vh, 820px);
+                max-height: 86vh;
+                overflow: hidden;
+            }
+
+            .modal-image {
+                height: 100%;
+                min-height: 0;
+                border-right: 1px solid var(--border);
+            }
+
+            .modal-body {
+                min-height: 0;
+                overflow-y: auto;
+            }
+
+            .modal-title-row {
+                padding-right: 2.5rem;
+            }
+        }
+
         /* 响应式 */
         @media (max-width: 768px) {
             .hero h1 {
