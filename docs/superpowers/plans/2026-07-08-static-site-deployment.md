@@ -1,6 +1,6 @@
 # Static Site Deployment Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
 
 **Goal:** Publish the static 山海经异兽图鉴 site to GitHub and Vercel from the correct project root.
 
@@ -23,7 +23,7 @@
 **Files:**
 - Create: `CLAUDE.md`
 
-- [ ] **Step 1: Confirm deploy root**
+- [x] **Step 1: Confirm deploy root**
 
 Run:
 
@@ -33,7 +33,7 @@ ls "E:/NDM下载/山海经神兽全览/shanhaijing"
 
 Expected: output includes `index.html` and `images/`.
 
-- [ ] **Step 2: Confirm parent is not the deploy root**
+- [x] **Step 2: Confirm parent is not the deploy root**
 
 Run:
 
@@ -43,11 +43,11 @@ ls "E:/NDM下载/山海经神兽全览"
 
 Expected: output includes both `images/` and `shanhaijing/`, so deploying the parent would include duplicate assets.
 
-- [ ] **Step 3: Write project rules**
+- [x] **Step 3: Write project rules**
 
 Create `E:/NDM下载/山海经神兽全览/shanhaijing/CLAUDE.md` with static-site rules, validation commands, and deployment conventions.
 
-- [ ] **Step 4: Commit later with deployment prep**
+- [x] **Step 4: Commit later with deployment prep**
 
 Do not commit yet; commit after `.gitignore` and validation are done.
 
@@ -57,7 +57,7 @@ Do not commit yet; commit after `.gitignore` and validation are done.
 - Inspect: `index.html`
 - Inspect: `images/*.png`
 
-- [ ] **Step 1: Scan for obvious secrets**
+- [x] **Step 1: Scan for obvious secrets**
 
 Run:
 
@@ -67,13 +67,13 @@ rg -i "api[_-]?key|secret|token|password|passwd|BEGIN (RSA|OPENSSH|PRIVATE) KEY|
 
 Expected: no matches.
 
-- [ ] **Step 2: Check image references**
+- [x] **Step 2: Check image references**
 
 Run a script that extracts `images/*.png` references from `index.html` and verifies each file exists.
 
 Expected: all referenced images exist.
 
-- [ ] **Step 3: Serve locally**
+- [x] **Step 3: Serve locally**
 
 Run:
 
@@ -84,7 +84,7 @@ python -m http.server 4173
 
 Expected: server starts on port `4173`.
 
-- [ ] **Step 4: Open local page**
+- [x] **Step 4: Open local page**
 
 Visit:
 
@@ -99,7 +99,7 @@ Expected: page renders with Chinese title and image cards; no obvious broken lay
 **Files:**
 - Create: `.gitignore`
 
-- [ ] **Step 1: Create `.gitignore`**
+- [x] **Step 1: Create `.gitignore`**
 
 Create:
 
@@ -116,7 +116,7 @@ dist/
 build/
 ```
 
-- [ ] **Step 2: Initialize git in project root**
+- [x] **Step 2: Initialize git in project root**
 
 Run:
 
@@ -128,7 +128,7 @@ git branch -M main
 
 Expected: repository initialized with branch `main`.
 
-- [ ] **Step 3: Review files to be committed**
+- [x] **Step 3: Review files to be committed**
 
 Run:
 
@@ -138,7 +138,7 @@ git status --short
 
 Expected: only `index.html`, `images/`, `CLAUDE.md`, `.gitignore`, and `docs/` appear.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 Run:
 
@@ -154,7 +154,7 @@ Expected: commit succeeds.
 **Files:**
 - External GitHub repository
 
-- [ ] **Step 1: Check GitHub CLI auth**
+- [x] **Step 1: Check GitHub CLI auth**
 
 Run:
 
@@ -164,7 +164,7 @@ gh auth status
 
 Expected: logged in to GitHub. If not logged in, ask the user to run `! gh auth login`.
 
-- [ ] **Step 2: Create repository**
+- [x] **Step 2: Create repository**
 
 Run:
 
@@ -174,7 +174,7 @@ gh repo create shanhaijing-bestiaire --public --source "E:/NDM下载/山海经�
 
 Expected: GitHub repository is created and `main` is pushed.
 
-- [ ] **Step 3: Record repository URL**
+- [x] **Step 3: Record repository URL**
 
 Run:
 
@@ -189,7 +189,7 @@ Expected: command prints the GitHub repository URL.
 **Files:**
 - External Vercel project
 
-- [ ] **Step 1: Check Vercel CLI**
+- [x] **Step 1: Check Vercel CLI**
 
 Run:
 
@@ -199,7 +199,7 @@ vercel --version
 
 Expected: Vercel CLI prints a version. If missing, use `npx vercel --version` or ask before installing globally.
 
-- [ ] **Step 2: Check Vercel auth**
+- [x] **Step 2: Check Vercel auth**
 
 Run:
 
@@ -209,7 +209,7 @@ vercel whoami
 
 Expected: logged in. If not logged in, ask the user to run `! vercel login`.
 
-- [ ] **Step 3: Deploy production**
+- [x] **Step 3: Deploy production**
 
 Run from project root:
 
@@ -220,7 +220,7 @@ vercel --prod
 
 Expected: command prints a production URL.
 
-- [ ] **Step 4: Verify deployment**
+- [x] **Step 4: Verify deployment**
 
 Open the production URL and confirm the page title contains `山海经异兽图鉴`.
 
@@ -231,3 +231,11 @@ Expected: deployed page renders successfully.
 - Spec coverage: covers project rules, local validation, GitHub publishing, Vercel deployment, and production verification.
 - Placeholder scan: no placeholders or unresolved TODOs.
 - Type consistency: not applicable; static site deployment only.
+
+## Outcome
+
+Completed on 2026-07-08.
+
+- The repository was published at <https://github.com/ZSLPZDZH/shanhaijing-bestiaire>.
+- The production site was deployed at <https://shanhaijing-alpha.vercel.app/>.
+- The project remains a dependency-free static site served from the repository root.

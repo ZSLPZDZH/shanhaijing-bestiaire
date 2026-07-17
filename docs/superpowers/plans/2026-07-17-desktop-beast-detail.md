@@ -1,6 +1,6 @@
 # Desktop Beast Detail Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
 
 **Goal:** Make every beast illustration fully visible in desktop detail dialogs while preserving the current mobile presentation.
 
@@ -16,7 +16,7 @@
 - Modify: `index.html:609`
 - Reference: `docs/superpowers/specs/2026-07-17-desktop-beast-detail-design.md`
 
-- [ ] **Step 1: Run a CSS contract check before implementation**
+- [x] **Step 1: Run a CSS contract check before implementation**
 
 Run:
 
@@ -26,7 +26,7 @@ node --input-type=module -e "import { readFileSync } from 'node:fs'; const html 
 
 Expected: exit code `1` with all four contracts reported as missing.
 
-- [ ] **Step 2: Add the medium and wide desktop media queries**
+- [x] **Step 2: Add the medium and wide desktop media queries**
 
 Insert the following immediately before the existing `/* 响应式 */` block in `index.html`:
 
@@ -82,13 +82,13 @@ Insert the following immediately before the existing `/* 响应式 */` block in 
         }
 ```
 
-- [ ] **Step 3: Re-run the CSS contract check**
+- [x] **Step 3: Re-run the CSS contract check**
 
 Run the command from Step 1 again.
 
 Expected: exit code `0` and `Responsive modal CSS contract passed`.
 
-- [ ] **Step 4: Check formatting and scope**
+- [x] **Step 4: Check formatting and scope**
 
 Run:
 
@@ -99,7 +99,7 @@ git diff -- index.html
 
 Expected: `git diff --check` produces no output; the diff changes only modal-related CSS in `index.html`.
 
-- [ ] **Step 5: Commit the responsive layout**
+- [x] **Step 5: Commit the responsive layout**
 
 ```bash
 git add index.html
@@ -115,7 +115,7 @@ Expected: one commit containing only `index.html`.
 - Verify: `beasts_data.json`
 - Verify: `images/lushu.png`
 
-- [ ] **Step 1: Start the static site**
+- [x] **Step 1: Start the static site**
 
 Run:
 
@@ -125,7 +125,7 @@ python -m http.server 4173
 
 Expected: the server listens on `http://127.0.0.1:4173/` and returns `200` for `index.html`, `beasts_data.json`, and `images/lushu.png`.
 
-- [ ] **Step 2: Verify the wide desktop layout at 1440×900**
+- [x] **Step 2: Verify the wide desktop layout at 1440×900**
 
 Open the site at a `1440×900` viewport, search for `鹿蜀`, open its card, and inspect the dialog.
 
@@ -136,7 +136,7 @@ Expected:
 - scrolling the right pane does not move the left image;
 - the close button remains visible.
 
-- [ ] **Step 3: Verify responsive desktop boundaries**
+- [x] **Step 3: Verify responsive desktop boundaries**
 
 Repeat at `1024×768`, `1920×1080`, and approximately `800×700`.
 
@@ -146,19 +146,19 @@ Expected:
 - `800×700` uses the stacked layout, shows the complete image with dark side space, and allows the dialog to scroll to all text;
 - no viewport introduces horizontal page scrolling.
 
-- [ ] **Step 4: Verify the phone layout at 390×844**
+- [x] **Step 4: Verify the phone layout at 390×844**
 
 Open the same entry at `390×844`.
 
 Expected: the existing stacked phone layout remains in place, the image continues to fill its `300px`-high area, and the dialog scrolls normally.
 
-- [ ] **Step 5: Verify interactions and browser errors**
+- [x] **Step 5: Verify interactions and browser errors**
 
 At one desktop viewport, open and close the dialog using the close button, overlay click, and `Escape`. Inspect the browser console and failed network requests.
 
 Expected: all three close methods work; there are no JavaScript errors and no local resource responses with status `404`.
 
-- [ ] **Step 6: Record final repository state**
+- [x] **Step 6: Record final repository state**
 
 Run:
 
@@ -167,4 +167,13 @@ git status --short --branch
 git log --oneline --decorate -3
 ```
 
-Expected: the working tree is clean and the current branch is `codex/improve-desktop-beast-view`. Do not push the branch.
+Expected: the working tree is clean and the feature commit is ready for a separately authorized publishing step.
+
+## Outcome
+
+Completed on 2026-07-18 and published through [PR #2](https://github.com/ZSLPZDZH/shanhaijing-bestiaire/pull/2).
+
+- `769px` to `979px` uses a stacked dialog with a contained image and sticky close control.
+- `980px` and wider uses a two-column dialog with the complete image beside independently scrolling text.
+- The existing `768px`-and-below mobile presentation remains unchanged.
+- Browser verification covered `390×844`, `800×700`, `1024×768`, `1440×900`, `1920×1080`, and a short-height `1024×500` case.
