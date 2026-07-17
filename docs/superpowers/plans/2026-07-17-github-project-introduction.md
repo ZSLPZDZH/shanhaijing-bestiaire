@@ -309,50 +309,165 @@ Expected: all unique image paths are verified and no exception is raised.
 Run:
 
 ```powershell
-$server = Start-Process `
-  -FilePath 'python' `
-  -ArgumentList '-m','http.server','4173','--bind','127.0.0.1' `
-  -WorkingDirectory $PWD `
-  -WindowStyle Hidden `
-  -PassThru
+$data = Get-Content -LiteralPath 'beasts_data.json' -Encoding utf8 -Raw | ConvertFrom-Json
+$firstImage = [string](
+  $data |
+    Where-Object { -not [string]::IsNullOrWhiteSpace([string]$_.image) } |
+    Select-Object -First 1
+).image
+
+if ([string]::IsNullOrWhiteSpace($firstImage)) {
+  throw 'No non-empty image path exists in beasts_data.json.'
+}
+
+$existingListeners = @(
+  Get-NetTCPConnection `
+    -LocalAddress '127.0.0.1' `
+    -LocalPort 4173 `
+    -State Listen `
+    -ErrorAction SilentlyContinue
+)
+
+if ($existingListeners.Count -gt 0) {
+  throw 'Port 127.0.0.1:4173 is already in use; refusing to reuse an existing server.'
+}
+
+$server = $null
 
 try {
+  $server = Start-Process `
+    -FilePath 'python' `
+    -ArgumentList '-m','http.server','4173','--bind','127.0.0.1' `
+    -WorkingDirectory $PWD `
+    -WindowStyle Hidden `
+    -PassThru
+
+  $startupTimer = [System.Diagnostics.Stopwatch]::StartNew()
   $ready = $false
-  foreach ($attempt in 1..10) {
-    try {
-      $index = Invoke-WebRequest -Uri 'http://127.0.0.1:4173/' -TimeoutSec 3 -UseBasicParsing
+
+  while ($startupTimer.Elapsed -lt [TimeSpan]::FromSeconds(5)) {
+    $server.Refresh()
+    if ($server.HasExited) {
+      throw "Local server process $($server.Id) exited before becoming ready."
+    }
+
+    $ownedListeners = @(
+      Get-NetTCPConnection `
+        -LocalAddress '127.0.0.1' `
+        -LocalPort 4173 `
+        -State Listen `
+        -ErrorAction SilentlyContinue |
+        Where-Object { $_.OwningProcess -eq $server.Id }
+    )
+
+    if ($ownedListeners.Count -gt 0) {
       $ready = $true
       break
-    } catch {
-      Start-Sleep -Milliseconds 500
     }
+
+    Start-Sleep -Milliseconds 100
   }
+
+  $startupTimer.Stop()
 
   if (-not $ready) {
-    throw 'Local server did not become ready within 5 seconds.'
+    throw "Local server process $($server.Id) did not own 127.0.0.1:4173 within 5 seconds."
   }
 
+  $index = Invoke-WebRequest -Uri 'http://127.0.0.1:4173/' -TimeoutSec 5 -UseBasicParsing
   $dataResponse = Invoke-WebRequest -Uri 'http://127.0.0.1:4173/beasts_data.json' -TimeoutSec 5 -UseBasicParsing
-  $firstImage = ($data | Where-Object { $_.image } | Select-Object -First 1).image
-  $imageResponse = Invoke-WebRequest -Uri "http://127.0.0.1:4173/$firstImage" -TimeoutSec 5 -UseBasicParsing
 
-  if ($index.StatusCode -ne 200 -or $index.Content -notmatch '山海经异兽图鉴') {
+  $index.RawContentStream.Position = 0
+  $indexReader = [System.IO.StreamReader]::new(
+    $index.RawContentStream,
+    [System.Text.UTF8Encoding]::new($false, $true),
+    $true,
+    1024,
+    $true
+  )
+  try {
+    $indexContent = $indexReader.ReadToEnd()
+  } finally {
+    $indexReader.Dispose()
+  }
+
+  if ($index.StatusCode -ne 200 -or $indexContent -notmatch '山海经异兽图鉴') {
     throw 'Local index page validation failed.'
   }
 
-  if ($dataResponse.StatusCode -ne 200 -or $imageResponse.StatusCode -ne 200) {
-    throw 'Local data or image resource validation failed.'
+  $dataResponse.RawContentStream.Position = 0
+  $dataReader = [System.IO.StreamReader]::new(
+    $dataResponse.RawContentStream,
+    [System.Text.UTF8Encoding]::new($false, $true),
+    $true,
+    1024,
+    $true
+  )
+  try {
+    $responseData = $dataReader.ReadToEnd() | ConvertFrom-Json
+  } finally {
+    $dataReader.Dispose()
   }
 
-  'Local site, JSON data, and image resource returned HTTP 200.'
+  if ($dataResponse.StatusCode -ne 200 -or @($responseData).Count -ne 109) {
+    throw 'Local JSON data validation failed.'
+  }
+
+  if ([string]::IsNullOrWhiteSpace($firstImage)) {
+    throw 'Image path is empty before the image request.'
+  }
+
+  $encodedImagePath = (
+    $firstImage -split '[\\/]' |
+      ForEach-Object { [Uri]::EscapeDataString($_) }
+  ) -join '/'
+  $imageResponse = Invoke-WebRequest `
+    -Uri "http://127.0.0.1:4173/$encodedImagePath" `
+    -TimeoutSec 5 `
+    -UseBasicParsing
+
+  if (
+    $imageResponse.StatusCode -ne 200 -or
+    $imageResponse.Headers['Content-Type'] -notmatch '^image/' -or
+    $imageResponse.RawContentLength -le 0
+  ) {
+    throw 'Local image resource validation failed.'
+  }
+
+  "Server process $($server.Id) owns 127.0.0.1:4173; site, 109-row JSON data, and $firstImage passed validation."
 } finally {
-  if ($server -and -not $server.HasExited) {
-    Stop-Process -Id $server.Id
+  if ($null -ne $server) {
+    $server.Refresh()
+    if (-not $server.HasExited) {
+      Stop-Process -Id $server.Id -ErrorAction Stop -PassThru |
+        Wait-Process -ErrorAction Stop
+    }
+
+    $server.Refresh()
+    if (-not $server.HasExited) {
+      throw "Local server process $($server.Id) still exists after cleanup."
+    }
+
+    if (Get-Process -Id $server.Id -ErrorAction SilentlyContinue) {
+      throw "PID $($server.Id) was not released after cleanup."
+    }
+  }
+
+  $remainingListeners = @(
+    Get-NetTCPConnection `
+      -LocalAddress '127.0.0.1' `
+      -LocalPort 4173 `
+      -State Listen `
+      -ErrorAction SilentlyContinue
+  )
+
+  if ($remainingListeners.Count -gt 0) {
+    throw 'Port 127.0.0.1:4173 is still listening after cleanup.'
   }
 }
 ```
 
-Expected: site, JSON, and a real image return HTTP `200`; the exact server process is stopped in `finally`.
+Expected: the newly started process owns the listener on `127.0.0.1:4173`; the site, 109-row JSON data, and a real non-empty `image/*` resource pass validation; `finally` stops the exact PID and confirms both the process and listener are released.
 
 ### Task 4: Update and Verify GitHub Repository Metadata
 
