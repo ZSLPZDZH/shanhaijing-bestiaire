@@ -14,9 +14,14 @@
 
 ```text
 /
-  index.html      # 单页应用入口，包含页面结构、样式和交互脚本
-  images/         # 异兽图片资源，文件名使用英文/拼音小写
-  CLAUDE.md       # 项目级工作规则
+  README.md                 # GitHub 项目介绍与在线体验入口
+  index.html                # 单页应用入口，包含页面结构、样式和交互脚本
+  beasts_data.json          # 异兽结构化数据
+  images/                   # 异兽图片资源，文件名使用英文/拼音小写
+  docs/assets/              # README 等项目文档使用的预览图
+  docs/superpowers/specs/  # 已确认的设计规格
+  docs/superpowers/plans/  # 可执行的实施计划
+  CLAUDE.md                 # 项目级工作规则
 ```
 
 ## 开发约定
