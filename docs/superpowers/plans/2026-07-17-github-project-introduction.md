@@ -322,14 +322,13 @@ if ([string]::IsNullOrWhiteSpace($firstImage)) {
 
 $existingListeners = @(
   Get-NetTCPConnection `
-    -LocalAddress '127.0.0.1' `
     -LocalPort 4173 `
     -State Listen `
     -ErrorAction SilentlyContinue
 )
 
 if ($existingListeners.Count -gt 0) {
-  throw 'Port 127.0.0.1:4173 is already in use; refusing to reuse an existing server.'
+  throw 'Port 4173 is already in use; refusing to reuse an existing server.'
 }
 
 $server = $null
@@ -455,14 +454,13 @@ try {
 
   $remainingListeners = @(
     Get-NetTCPConnection `
-      -LocalAddress '127.0.0.1' `
       -LocalPort 4173 `
       -State Listen `
       -ErrorAction SilentlyContinue
   )
 
   if ($remainingListeners.Count -gt 0) {
-    throw 'Port 127.0.0.1:4173 is still listening after cleanup.'
+    throw 'Port 4173 is still listening after cleanup.'
   }
 }
 ```
