@@ -21,10 +21,10 @@
 Run:
 
 ```bash
-node --input-type=module -e "import { readFileSync } from 'node:fs'; const html = readFileSync('index.html', 'utf8'); const checks = [['medium desktop contains image', /@media \(min-width: 769px\)[\s\S]*?\.modal-image img\s*\{[\s\S]*?object-fit:\s*contain/], ['wide desktop uses columns', /@media \(min-width: 980px\)[\s\S]*?grid-template-columns:\s*minmax\(0, 1\.05fr\)\s*minmax\(420px, 0\.95fr\)/], ['wide desktop scrolls text', /@media \(min-width: 980px\)[\s\S]*?\.modal-body\s*\{[\s\S]*?overflow-y:\s*auto/]]; const missing = checks.filter(([, pattern]) => !pattern.test(html)).map(([name]) => name); if (missing.length) { console.error('Missing:', missing.join(', ')); process.exit(1); } console.log('Responsive modal CSS contract passed');"
+node --input-type=module -e "import { readFileSync } from 'node:fs'; const html = readFileSync('index.html', 'utf8'); const checks = [['medium desktop contains image', /@media \(min-width: 769px\)[\s\S]*?\.modal-image img\s*\{[\s\S]*?object-fit:\s*contain/], ['medium desktop keeps close visible', /@media \(min-width: 769px\) and \(max-width: 979px\)[\s\S]*?\.modal-close\s*\{[\s\S]*?position:\s*sticky/], ['wide desktop uses columns', /@media \(min-width: 980px\)[\s\S]*?grid-template-columns:\s*minmax\(0, 1\.05fr\)\s*minmax\(420px, 0\.95fr\)/], ['wide desktop scrolls text', /@media \(min-width: 980px\)[\s\S]*?\.modal-body\s*\{[\s\S]*?overflow-y:\s*auto/]]; const missing = checks.filter(([, pattern]) => !pattern.test(html)).map(([name]) => name); if (missing.length) { console.error('Missing:', missing.join(', ')); process.exit(1); } console.log('Responsive modal CSS contract passed');"
 ```
 
-Expected: exit code `1` with all three contracts reported as missing.
+Expected: exit code `1` with all four contracts reported as missing.
 
 - [ ] **Step 2: Add the medium and wide desktop media queries**
 
@@ -44,6 +44,15 @@ Insert the following immediately before the existing `/* 响应式 */` block in 
 
             .modal-image img {
                 object-fit: contain;
+            }
+        }
+
+        @media (min-width: 769px) and (max-width: 979px) {
+            .modal-close {
+                position: sticky;
+                top: 1rem;
+                right: auto;
+                margin: 1rem 1rem -52px auto;
             }
         }
 
